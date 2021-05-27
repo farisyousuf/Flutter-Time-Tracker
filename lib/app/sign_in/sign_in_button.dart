@@ -3,11 +3,12 @@ import 'package:time_tracker_flutter_course/common_widgets/custom_elevated_butto
 
 class SignInButton extends CustomElevatedButton {
   SignInButton({
-    String text,
+    @required String text,
     Color color,
     Color textColor,
     VoidCallback onPressed,
-  }) : super(
+  })  : assert(text != null),
+        super(
           child: Text(
             text,
             style: TextStyle(color: textColor, fontSize: 15.0),
