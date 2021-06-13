@@ -20,15 +20,16 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
 
-
   String get _email => _emailController.text;
   String get _password => _passwordController.text;
   FormType _formType = FormType.signIn;
   bool _submitted = false;
+  bool _isLoading = false;
 
   Future<void> _submit() async {
     setState(() {
-      _submitted =  true;
+      _submitted = true;
+      _isLoading = true;
     });
     try {
       if (_formType == FormType.signIn)
@@ -38,6 +39,10 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       Navigator.of(context).pop();
     } catch (e) {
       print(e.toString());
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -55,7 +60,8 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
   }
 
   List<Widget> _buildChildren() {
-    bool submitEnabled = widget.emailValidator.isValid(_email) && widget.emailValidator.isValid(_password);
+    bool submitEnabled = widget.emailValidator.isValid(_email) &&
+        widget.emailValidator.isValid(_password) && !_isLoading;
     final _primaryText = _formType == FormType.signIn ? 'Sign in' : 'Register';
     final _secondaryText = _formType == FormType.signIn
         ? 'Need an account? Register'
@@ -72,7 +78,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       ),
       SizedBox(height: 8.0),
       TextButton(
-        onPressed: _toggleForm,
+        onPressed: _isLoading ? null : _toggleForm,
         child: Text(
           _secondaryText,
         ),
@@ -81,12 +87,14 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
   }
 
   TextField _buildPasswordTextField() {
-    bool showErrorText = _submitted && !widget.passwordValidator.isValid(_password);
+    bool showErrorText =
+        _submitted && !widget.passwordValidator.isValid(_password);
     return TextField(
       controller: _passwordController,
       decoration: InputDecoration(
         labelText: 'Password',
         errorText: showErrorText ? widget.passwordErrorText : null,
+        enabled: !_isLoading,
       ),
       obscureText: true,
       textInputAction: TextInputAction.done,
@@ -104,6 +112,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         labelText: 'Email',
         hintText: 'test@abc.com',
         errorText: showErrorText ? widget.emailErrorText : null,
+        enabled: !_isLoading,
       ),
       autocorrect: false,
       keyboardType: TextInputType.emailAddress,
