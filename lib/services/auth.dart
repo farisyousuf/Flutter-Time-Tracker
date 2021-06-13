@@ -9,6 +9,8 @@ abstract class AuthBase {
   Stream<User> authStateChanges();
   Future<User> signInWithGoogle();
   Future<User> signInWithFacebook();
+  Future<User> signInWithEmailAndPassword(String email, String password);
+  Future<User> createUserWithEmailAndPassword(String email, String password);
 }
 
 class Auth implements AuthBase {
@@ -22,6 +24,21 @@ class Auth implements AuthBase {
   @override
   Future<User> signInAnonymously() async {
     final userCredentials = await _firebaseAuth.signInAnonymously();
+    return userCredentials.user;
+  }
+
+  @override
+  Future<User> signInWithEmailAndPassword(String email, String password) async {
+    final userCredentials = await _firebaseAuth.signInWithCredential(
+        EmailAuthProvider.credential(email: email, password: password));
+    return userCredentials.user;
+  }
+
+  @override
+  Future<User> createUserWithEmailAndPassword(
+      String email, String password) async {
+    final userCredentials = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email, password: password);
     return userCredentials.user;
   }
 
@@ -66,7 +83,7 @@ class Auth implements AuthBase {
 // Check result status
     switch (res.status) {
       case FacebookLoginStatus.Success:
-      // Logged in
+        // Logged in
         final FacebookAccessToken accessToken = res.accessToken;
         print('Fb Access token: ${accessToken.token}');
         final userCredential = await _firebaseAuth.signInWithCredential(
@@ -74,13 +91,13 @@ class Auth implements AuthBase {
         );
         return userCredential.user;
       case FacebookLoginStatus.Cancel:
-      // User cancel log in
+        // User cancel log in
         throw FirebaseAuthException(
           code: "ERROR_ABORTED",
           message: "Aborted by user",
         );
       case FacebookLoginStatus.Error:
-      // Log in failed
+        // Log in failed
         throw FirebaseAuthException(
           code: "ERROR_FACEBOOK_LOGIN_FAILED",
           message: res.error.developerMessage,
@@ -88,7 +105,6 @@ class Auth implements AuthBase {
       default:
         throw UnimplementedError();
     }
-
   }
 
   @override

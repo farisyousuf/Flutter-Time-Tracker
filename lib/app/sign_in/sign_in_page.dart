@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:time_tracker_flutter_course/app/sign_in/email_sign_in_page.dart';
 import 'package:time_tracker_flutter_course/app/sign_in/sign_in_button.dart';
 import 'package:time_tracker_flutter_course/app/sign_in/social_sign_in_button.dart';
 import 'package:time_tracker_flutter_course/services/auth.dart';
@@ -10,27 +11,32 @@ class SignInPage extends StatelessWidget {
   Future<void> _signInAnonymously() async {
     try {
       await auth.signInAnonymously();
-    } catch(e) {
+    } catch (e) {
       print(e.toString());
     }
   }
+
   Future<void> _signInWithGoogle() async {
     try {
       await auth.signInWithGoogle();
-    } catch(e) {
+    } catch (e) {
       print(e.toString());
     }
   }
+
   Future<void> _signInWithFacebook() async {
     try {
       await auth.signInWithFacebook();
-    } catch(e) {
+    } catch (e) {
       print(e.toString());
     }
   }
 
   void _signInWithEmail(BuildContext context) {
-    //TODO Sign in with Email
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      fullscreenDialog: true,
+      builder: (context) => EmailSignInPage(auth: auth,),
+    ));
   }
 
   @override
