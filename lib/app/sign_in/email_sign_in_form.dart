@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:time_tracker_flutter_course/app/utils/validators.dart';
 import 'package:time_tracker_flutter_course/common_widgets/form_submit_button.dart';
+import 'package:time_tracker_flutter_course/common_widgets/show_alert_dialog.dart';
 import 'package:time_tracker_flutter_course/services/auth.dart';
 
 enum FormType { signIn, register }
@@ -38,7 +41,12 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         await widget.auth.createUserWithEmailAndPassword(_email, _password);
       Navigator.of(context).pop();
     } catch (e) {
-      print(e.toString());
+      showAlertDialog(
+        context,
+        title: "Sign In Failed",
+        content: e.toString(),
+        dialogActionText: "Ok",
+      );
     } finally {
       setState(() {
         _isLoading = false;
@@ -61,7 +69,8 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
 
   List<Widget> _buildChildren() {
     bool submitEnabled = widget.emailValidator.isValid(_email) &&
-        widget.emailValidator.isValid(_password) && !_isLoading;
+        widget.emailValidator.isValid(_password) &&
+        !_isLoading;
     final _primaryText = _formType == FormType.signIn ? 'Sign in' : 'Register';
     final _secondaryText = _formType == FormType.signIn
         ? 'Need an account? Register'
